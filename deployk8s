@@ -1,0 +1,54 @@
+[STEPS FOR KUBERNETES MASTER MACHINE]
+
+1. apt update
+2. sudo apt install docker.io
+3. systemctl enable docker && systemctl start docker
+4. docker version
+5. sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+6. curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+7. 
+cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+8. sudo apt-get update
+9. sudo apt-get install -y kubelet kubeadm kubectl
+10. systemctl enable kubelet && systemctl start kubelet
+11. swapoff -a
+12. =========================================================================
+cat <<EOF >  /etc/sysctl.d/k8s.conf
+   net.bridge.bridge-nf-call-ip6tables = 1
+   net.bridge.bridge-nf-call-iptables = 1
+EOF
+=========================================================================
+13. sysctl --system
+14. kubeadm init --apiserver-advertise-address=192.168.10.10 --pod-network-cidr=192.168.0.0/16 --service-cidr=192.168.2.0/24
+15. mkdir -p $HOME/.kube
+16. sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+17. sudo chown $(id -u):$(id -g) $HOME/.kube/config
+18. kubectl get nodes
+19. kubectl get pods --all-namespaces
+20. kubectl apply -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml
+21. kubectl get pods --all-namespaces
+22. kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.3/aio/deploy/recommended.yaml
+23. kubectl get pods --all-namespaces
+24. cd $HOME/.kube/
+25. Download kubectl for Windows - https://storage.googleapis.com/kubernetes-release/release/v1.16.0/bin/windows/amd64/kubectl.exe
+26. Access URL for UI Dashbaord - http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/.
+27. kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
+28. kubectl get namespace
+29. kubectl describe serviceaccounts
+30. kubectl describe serviceaccount default -n kube-system
+31. get token to login into dashboard
+    kubectl describe secret default-token-5f757 -n kube-system
+32. make master node schedulable
+    kubectl taint nodes --all node-role.kubernetes.io/master-
+33. kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.7/components.yaml
+34. edit metrics deployment
+      containers:
+        - name: metrics-server
+          image: 'k8s.gcr.io/metrics-server/metrics-server:v0.3.7'
+          args:
+            - '--cert-dir=/tmp'
+            - '--secure-port=4443'
+            - '--kubelet-insecure-tls'
+            - '--kubelet-preferred-address-types=InternalIP'
