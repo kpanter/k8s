@@ -33,17 +33,18 @@ EOF
 23. kubectl get pods --all-namespaces
 24. cd $HOME/.kube/
 25. Download kubectl for Windows - https://storage.googleapis.com/kubernetes-release/release/v1.16.0/bin/windows/amd64/kubectl.exe
-26. Access URL for UI Dashbaord - http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/.
-27. kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
-28. kubectl get namespace
-29. kubectl describe serviceaccounts
-30. kubectl describe serviceaccount default -n kube-system
-31. get token to login into dashboard
+26. kubectl proxy
+27. Access URL for UI Dashbaord - http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/.
+28. kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
+29. kubectl get namespace
+30. kubectl describe serviceaccounts
+31. kubectl describe serviceaccount default -n kube-system
+32. get token to login into dashboard
     kubectl describe secret default-token-5f757 -n kube-system
-32. make master node schedulable
+33. make master node schedulable
     kubectl taint nodes --all node-role.kubernetes.io/master-
-33. kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.7/components.yaml
-34. edit metrics deployment
+34. kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.7/components.yaml
+35. edit metrics deployment
       containers:
         - name: metrics-server
           image: 'k8s.gcr.io/metrics-server/metrics-server:v0.3.7'
